@@ -46,15 +46,21 @@ export const OrderBookTables = () => {
     <Box>
       <h4>Spread: {formatNumber(spreadPercentage)}% </h4>
       <Flex flexWrap="wrap">
-        <Box padding={4} width={[1, 1 / 2]}>
-          <h4 style={{ backgroundColor: "lightgreen" }}>
+        <Box padding={2} width={[1, 1 / 2]}>
+          <h4
+            className="darkmode-ignore"
+            style={{ backgroundColor: "lightgreen", width: "100%" }}
+          >
             Bids (orders to buy buy bitcoin)
           </h4>
           <OrderTable ordersToRender={bidsToRender} />
         </Box>
 
-        <Box padding={4} width={[1, 1 / 2]}>
-          <h4 style={{ backgroundColor: "lightcoral" }}>
+        <Box padding={2} width={[1, 1 / 2]}>
+          <h4
+            className="darkmode-ignore"
+            style={{ backgroundColor: "lightcoral", width: "100%" }}
+          >
             Asks (orders to sell bitcoin)
           </h4>
           <OrderTable ordersToRender={asksToRender} />

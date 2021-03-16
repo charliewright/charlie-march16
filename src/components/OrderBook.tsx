@@ -1,56 +1,16 @@
 import React, { useState } from "react";
-import { isEqual } from "lodash";
 import useInterval from "react-useinterval";
 import { Flex, Box } from "rebass";
-
-const PRICE_SUBSCRIBE_EVENT = JSON.stringify({
-  event: "subscribe",
-  feed: "book_ui_1",
-  product_ids: ["PI_XBTUSD"],
-});
-
-type OrderFromWebSocket = [number, number];
+import {
+  OrderFromWebSocket,
+  ordersInMemory,
+} from "../utils/in-memory-order-book";
 
 interface OrderToDisplay {
   price: number;
   size: number;
   total: number; // t​he summed amount of the size at the current level and every level below it
 }
-
-interface OrderBook {
-  bids: OrderFromWebSocket[];
-  asks: OrderFromWebSocket[];
-}
-interface Dictionary {
-  [key: string]: number;
-}
-
-let ordersInMemory: OrderBook = { bids: [], asks: [] };
-let prevOrdersInMemory: OrderBook = { bids: [], asks: [] };
-
-const orderBookSocket = new WebSocket("wss://www.cryptofacilities.com/ws/v1​");
-
-orderBookSocket.onopen = () => {
-  // Send a message to let the api know I want to receive messages
-  orderBookSocket.send(PRICE_SUBSCRIBE_EVENT);
-};
-
-const updateOrdersInMemory = (e: any) => {
-  const newOrders = JSON.parse(e.data) as OrderBook;
-
-  const mergedOrders = mergeOrderBooks(ordersInMemory, newOrders);
-  prevOrdersInMemory = { ...ordersInMemory };
-  ordersInMemory = { ...mergedOrders };
-
-  if (!isEqual(ordersInMemory.asks, prevOrdersInMemory.asks)) {
-    console.log(`this is good, the asks are not equal. Its going to refresh`);
-    console.log(
-      `in mem have ${ordersInMemory.asks.length} asks and ${ordersInMemory.bids.length} bids`
-    );
-  }
-};
-
-orderBookSocket.onmessage = updateOrdersInMemory;
 
 export const OrderBookTables = () => {
   const [bidsToRender, setBids] = useState<OrderToDisplay[]>([]);
@@ -133,13 +93,6 @@ const OrderTable = ({
   </table>
 );
 
-const mergeOrderBooks = (previousOrders: OrderBook, newOrders: OrderBook) => {
-  const newBids = mergeOrders(newOrders?.bids, previousOrders.bids);
-  const newAsks = mergeOrders(newOrders?.asks, previousOrders.asks);
-
-  return { bids: newBids.slice(0, 100), asks: newAsks.slice(0, 100) };
-};
-
 const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
   let i = 0,
     total = 0;
@@ -152,29 +105,6 @@ const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
     i++;
   }
   return bidsWithTotals;
-};
-
-const mergeOrders = (
-  oldOrders: OrderFromWebSocket[],
-  newOrders: OrderFromWebSocket[]
-) => {
-  if (!newOrders) {
-    return oldOrders;
-  }
-
-  // merge the bids + asks using a hash map
-  const orderMap = {} as Dictionary;
-
-  oldOrders?.forEach((order) => (orderMap[order[0].toString()] = order[1]));
-  // stomp on the hashmap with new orders.
-  newOrders.forEach((order) => (orderMap[order[0].toString()] = order[1]));
-  // Turn it back into the object we were expecting (tuples)
-  const mergedOrders = Object.entries(orderMap).map((entry) => [
-    parseFloat(entry[0]),
-    entry[1],
-  ]) as OrderFromWebSocket[];
-
-  return mergedOrders.filter((order) => order[1]); // remove orders with no size
 };
 
 const formatNumber = (num: number) => {

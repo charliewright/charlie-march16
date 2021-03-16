@@ -1,13 +1,11 @@
 import React from "react";
 import "./App.css";
-import { WebSocketDemo } from "./SocketDemo";
+import { OrderBookTables } from "./OrderBook";
 
 function App() {
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Order book app</h1>
-
-      <h4> Order Book </h4>
+      <h1> BTC/USD Order Book </h1>
       <div>
         In securities trading an order book contains the list of buy orders and
         the list of sell orders.
@@ -16,8 +14,7 @@ function App() {
         A matching engine uses the book to determine which orders can be fully
         or partially executed.
       </div>
-      <h4> Websocket demo</h4>
-      <WebSocketDemo />
+      <OrderBookTables />
     </div>
   );
 }

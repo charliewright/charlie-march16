@@ -1,6 +1,6 @@
 ## Quickstart Instructions
 
-- You will need a node version > 12.0.0. I recommend using (NVM)[https://danyal.dk/blog/2018/11/11/install-nvm-node-version-manager-node-on-mac/] to manage your node version.
+- You will need a node version > 12.0.0. I recommend using [NVM](https://danyal.dk/blog/2018/11/11/install-nvm-node-version-manager-node-on-mac/) to manage your node version.
 - `yarn && yarn start` to get a local build set up.
 - `yarn test` to run the unit tests
 - check out a live version at
@@ -13,7 +13,7 @@ There are a lot of cool ways to improve the order book:
 
 - Render performance and UX could be improved by grouping orders by price. If you group the orders together in $50 or $100 (or variable) segments, the entire book component row would not need to render as frequently. Top prices would stay roughly the same while the volume + totals would shift.
 
-- If it were a production app, I might make an api layer that validates the messages coming in from the websocket. I might use a package like (Runtypes)[https://github.com/pelotom/runtypes] to ensure that the messages conform to the contract the frontend is expecting.
+- If it were a production app, I might make an api layer that validates the messages coming in from the websocket. I might use a package like [Runtypes](https://github.com/pelotom/runtypes) to ensure that the messages conform to the contract the frontend is expecting.
 
 - I might also spend lots more time fiddling with CSS to make the app look unique and great!
 
@@ -21,9 +21,7 @@ There are a lot of cool ways to improve the order book:
 
 Aggregating the deltas and re-rendering the order book is moderately expensive computationally. This aggregation and rendering happens on the client browser side, so as long as we efficiently serve the page assets (html and bundled JavaScript) the page should load properly.
 
-I think that there are concerns with having thousands (tens of thousands) of concurrent websocket connections. The folks at (https://stackoverflow.com/questions/15872788/maximum-concurrent-socket-io-connections)[stackoverflow] say that with a bit of optimization it is possible to have 1 million active socket connections.
-
-We might want to plan for the order book to handle dropped messages from the websockets, occasionally purging the order book I am storing in browser memory.
+I think that there are concerns with having thousands (tens of thousands) of concurrent websocket connections, although the folks at [stackoverflow](https://stackoverflow.com/questions/15872788/maximum-concurrent-socket-io-connections) say that with a bit of optimization it is possible to have 1 million active socket connections. We might want to plan for the order book to handle dropped messages from the websockets, occasionally purging the order book I am storing in browser memory.
 
 If this were a production app serving thousands of concurrent users, I would want to have appropriate logging (sentry) and health checks to be able to diagnose and fix issues.
 
@@ -48,9 +46,9 @@ Rather than writing an `if` statement and increasing the complexity of the code 
 
 ### How would you track down a performance issue in production? Have you ever had to do this?
 
-Google chrome has a great tool for frontend performance profiling. It is possible to use the (https://developers.google.com/web/tools/chrome-devtools/rendering-tools/)[js profiler] to track down bottlenecks when executing JavaScript and rendering DOM. It is sometimes difficult to make sense of the profiler in production if your JavaScript bundle is minified.
+Google chrome has a great tool for frontend performance profiling. It is possible to use the [js profiler](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/) to track down bottlenecks when executing JavaScript and rendering DOM. It is sometimes difficult to make sense of the profiler in production if your JavaScript bundle is minified.
 
-Ideally, when tracking down a performance issue I would be able to replicate the issue locally. Sometimes you might need to use a (https://github.com/marak/Faker.js/)[faker] to stress-test and replicate the performance bottleneck.
+Ideally, when tracking down a performance issue I would be able to replicate the issue locally. Sometimes you might need to use a [faker](https://github.com/marak/Faker.js/) to stress-test and replicate the performance bottleneck.
 
 Once I have the performance issue locally, I like to use `console.time()` calls while progressively commenting out code to track down the offending line/component. I call this method "binary search debugging".
 

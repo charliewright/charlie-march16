@@ -31,9 +31,9 @@ There are a lot of cool ways to improve the order book:
 
 I think it is very important for teams to write frontend applications in TypeScript over JavaScript. TypeScript is slightly more restrictive when writing code but pays off when collaborating with larger teams or in an organization. Having type annotations and code completion in your IDE is also a gamechanger.
 
-TypeScript transpiles to JavaScript, and lets you use language features that might not be available in all runtime environments (internet explorer).
+TypeScript transpiles to JavaScript, and lets you use language features that might not be available in every runtime environment (Internet Explorer, for example).
 
-Optional chaining `orderBook?.bids` is a very useful feature in TypeScript. Optional chaining allows us to read a property deep within a nested object without having to validate if everything in the chain is defined.
+**Optional chaining** `orderBook?.bids` is a very useful feature in TypeScript. Optional chaining allows us to read a property deep within a nested object without having to validate if everything in the chain is defined.
 
 For example, in this code (taken from the project) oldOrders might be null
 
@@ -42,21 +42,27 @@ oldOrders?.forEach((order) => (orderMap[order[0].toString()] = order[1]));
 
 ```
 
-Rather than writing an `if` statement and increasing the complexity of the code by adding another code path with indentation and curly brackets `{`, I can optionally chain off the `oldOrders` object. This results in more readable code, and hopefully fewer "cannot access X of undefined" errors.
+Rather than writing an `if` statement and increasing the complexity of the code by adding another code path with indentation and curly brackets `{`, I can optionally chain off the `oldOrders` object. 
+
+The ? operator results in more readable code, and hopefully fewer "cannot access X of undefined" errors.
 
 ### How would you track down a performance issue in production? Have you ever had to do this?
 
-Google chrome has a great tool for frontend performance profiling. It is possible to use the [js profiler](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/) to track down bottlenecks when executing JavaScript and rendering DOM. It is sometimes difficult to make sense of the profiler in production if your JavaScript bundle is minified.
+Google chrome has a great tool for frontend performance profiling. It is possible to use the [js profiler](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/) to track down bottlenecks when executing JavaScript and rendering DOM.
 
-Ideally, when tracking down a performance issue I would be able to replicate the issue locally. Sometimes you might need to use a [faker](https://github.com/marak/Faker.js/) to stress-test and replicate the performance bottleneck.
+If your JavaScript bundle is minified it is difficult to make sense of the profiler in production.
 
-Once I have the performance issue locally, I like to use `console.time()` calls while progressively commenting out code to track down the offending line/component. I call this method "binary search debugging".
+Ideally, when tracking down a performance issue I would be able to replicate the issue locally. Sometimes you might need to use a [faker](https://github.com/marak/Faker.js/) or an artificial environment to stress-test and replicate a performance bottleneck.
 
-I have had to track down production issues before. At a previous company, we had shipped an angular data table component that would lag and hang the browser if there were too many rows. I was able to isolate the bug to an input form that we were initializing for each row - meaning that our page had hundreds of `angular watchers`. I fixed this by initializing the edit form only when clicking on the cell in question.
+Once I reproduce the performance issue locally, I like to use `console.time()` calls while progressively commenting out code to track down the offending line/component. I call this method "binary search debugging".
+
+I have had to track down production issues before. At a previous company, we had shipped an angular data table component that would lag and hang the browser if there were too many rows. I was able to isolate the bug to an `<input>` form that we were initializing for each row - meaning that our page had hundreds of `angular watchers`. 
+
+I fixed the bug by initializing the `<input>` form only when clicking on the cell in question.
 
 ### Can you describe common security concerns to consider for a frontend developer?
 
-Frontend developers certainly need to be concerned about Cross-Site-Scripting (XSS) vulnerabilities.
+Frontend developers need to be concerned about Cross-Site-Scripting (XSS) vulnerabilities.
 
 In simple terms, agents with malicious intent might persist data into a Web Application that causes a harmful script to be executed on another client's browser.
 
@@ -64,13 +70,13 @@ Frontend developers need to take care to sanitize data input/output and avoid re
 
 Protecting an application against XSS vulnerabilities is challenging because of the dependency-management system of modern web applications (npm/yarn and node modules). In addition to writing defensive code, we need to ensure that we are not using compromised packages in our dependency tree. It is smart to use an automated tool to audit NodeJS dependencies for known vulnerabilities.
 
-When working with a team of developers, it is important to raise security questions at code review and development time. There are many other potential exploits (clickjacking, PII leaks) that we need to guard against, and so it is important not to introduce potential vulnerabilities.
+When working with a team of developers, it is important to raise security questions at code review and development time. There are many other potential exploits (clickjacking, PII leaks) that we need to guard against, and so it is important not to introduce potential vulnerabilities in the first place.
 
 ### How would you improve the API that you just used?
 
 As a consumer of the orders API, I had to write logic to aggregate the orders delta.
 
-I were developing the API for many clients (web, mobile app, more than one web client app) it might be better to have the WebSocket aggregate the orders on the server side. Having a more complete server (returns all orders, spread, groupings) with a "thin client" is sometimes easier from a development perspective.
+I were developing the API for many clients (web, mobile app, more than one web client app) it might be better to have the WebSocket aggregate the orders on the server side. Having a more complete server (returns all orders, spread, groupings) with a "thin client" would make client development more straightforward. 
 
 <!-- TODO:
 

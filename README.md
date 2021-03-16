@@ -5,9 +5,9 @@
 - `yarn test` to run the unit tests
 - check out a live version at
 
-## Notes
+## Q/A
 
-1. What would you add to your solution if you had more time?
+### What would you add to your solution if you had more time?
 
 There are a lot of cool ways to improve the order book:
 
@@ -17,7 +17,7 @@ If it were a production app, I might make an api layer that validates the messag
 
 I might also spend lots more time fiddling with CSS to make the app look unique and great!
 
-2. What would you have done differently if you knew this page was going to get thousands of views per second vs per week?
+### What would you have done differently if you knew this page was going to get thousands of views per second vs per week?
 
 Aggregating the deltas and re-rendering the order book is moderately expensive computationally. This aggregation and rendering happens on the client browser side, so as long as we efficiently serve the page assets (html and bundled JavaScript) the page should load properly.
 
@@ -27,7 +27,7 @@ If this were a production app serving thousands of concurrent users, I would wan
 
 If I knew that my page was getting thousands of views per second, I would certainly build in a monetization strategy 😏.
 
-3. What was the most useful feature that was added to the latest version of your chosen language? Please include a snippet of code that shows how you've used it.
+### What was the most useful feature that was added to the latest version of your chosen language? Please include a snippet of code that shows how you've used it.
 
 I think it is very important for teams to write JS applications in TypeScript over JavaScript. TypeScript is slightly more restrictive when writing code but pays off when collaborating in code reviews or reading code. Having type annotations and code completion in your IDE is also a gamechanger.
 
@@ -44,7 +44,7 @@ oldOrders?.forEach((order) => (orderMap[order[0].toString()] = order[1]));
 
 Rather than writing an `if` statement and increasing the complexity of the code by adding another code path with indentation and curly brackets `{`, I can optionally chain off the `oldOrders` object. This results in more readable code, and hopefully fewer "cannot access X of undefined" errors.
 
-4. How would you track down a performance issue in production? Have you ever had to do this?
+### How would you track down a performance issue in production? Have you ever had to do this?
 
 Google chrome has a great tool for frontend performance profiling. It is possible to use the (js profiler)[https://developers.google.com/web/tools/chrome-devtools/rendering-tools/] to track down bottlenecks when executing JavaScript and rendering DOM. It is sometimes difficult to make sense of the profiler in production if your JavaScript bundle is minified.
 
@@ -54,7 +54,7 @@ Once I have the performance issue locally, I like to use `console.time()` calls 
 
 I have had to track down production issues before. At a previous company, we had shipped an angular data table component that would lag and hang the browser if there were too many rows. I was able to isolate the bug to an input form that we were initializing for each row - meaning that our page had hundreds of `angular watchers`. I fixed this by initializing the edit form only when clicking on the cell in question.
 
-5. Can you describe common security concerns to consider for a frontend developer?
+### Can you describe common security concerns to consider for a frontend developer?
 
 Frontend developers certainly need to be concerned about Cross-Site-Scripting (XSS) vulnerabilities.
 
@@ -66,13 +66,13 @@ Protecting an application against XSS vulnerabilities is challenging because of 
 
 When working with a team of developers, it is important to raise security questions at code review and development time. There are many other potential exploits (clickjacking, PII leaks) that we need to guard against, and so it is important not to introduce potential vulnerabilities.
 
-6. How would you improve the API that you just used?
+### How would you improve the API that you just used?
 
 As a consumer of the orders API, I had to write logic to aggregate the orders delta.
 
 I were developing the API for many clients (web, mobile app, more than one web client app) it might be better to have the WebSocket aggregate the orders on the server side. Having a more complete server (returns all orders, spread, groupings) with a "thin client" is sometimes easier from a development perspective.
 
-TODO:
+<!-- TODO:
 
 - error handling around dead socket maybe!?
 - make sure the layout works on mobile (table + header + dark mode)
@@ -82,4 +82,4 @@ TODO:
 css fiddle on mobile/desktop
 get rid of noisy numbers (group orders together! that is a good feature on the exchange)
 drop it onto netlify!
-more clickability (links to websocket!? other order books)
+more clickability (links to websocket!? other order books) -->

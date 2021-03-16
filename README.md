@@ -19,13 +19,13 @@ There are a lot of cool ways to improve the order book:
 
 ### What would you have done differently if you knew this page was going to get thousands of views per second vs per week?
 
-Aggregating the deltas and re-rendering the order book is moderately expensive computationally. This aggregation and rendering happens on the client browser side, so as long as we efficiently serve the page assets (html and bundled JavaScript) the page should load properly.
+- Aggregating the deltas and re-rendering the order book is moderately expensive computationally. This aggregation and rendering happens on the client browser side, so as long as we efficiently serve the page assets (html and bundled JavaScript) the page should load properly.
 
-I think that there are concerns with having thousands (tens of thousands) of concurrent websocket connections, although the folks at [stackoverflow](https://stackoverflow.com/questions/15872788/maximum-concurrent-socket-io-connections) say that with a bit of optimization it is possible to have 1 million active socket connections. We might want to plan for the order book to handle dropped messages from the websockets, occasionally purging the order book I am storing in browser memory.
+- I think that there are concerns with having thousands (tens of thousands) of concurrent websocket connections, although the folks at [stackoverflow](https://stackoverflow.com/questions/15872788/maximum-concurrent-socket-io-connections) say that with a bit of optimization it is possible to have 1 million active socket connections. We might want to plan for the order book to handle dropped messages from the websockets, occasionally purging the order book I am storing in browser memory.
 
-If this were a production app serving thousands of concurrent users, I would want to have appropriate logging (sentry) and health checks to be able to diagnose and fix issues.
+- If this were a production app serving thousands of concurrent users, I would want to have appropriate logging (sentry) and health checks to be able to diagnose and fix issues.
 
-If I knew that my page was getting thousands of views per second, I would certainly build in a monetization strategy 😏.
+- If I knew that my page was getting thousands of views per second, I would certainly build in a monetization strategy 😏.
 
 ### What was the most useful feature that was added to the latest version of your chosen language? Please include a snippet of code that shows how you've used it.
 

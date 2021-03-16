@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { isEqual } from "lodash";
 import useInterval from "react-useinterval";
 import { Flex, Box } from "rebass";
@@ -28,13 +28,33 @@ interface Dictionary {
 let ordersInMemory: OrderBook = { bids: [], asks: [] };
 let prevOrdersInMemory: OrderBook = { bids: [], asks: [] };
 
+const orderBookSocket = new WebSocket("wss://www.cryptofacilities.com/ws/v1​");
+
+orderBookSocket.onopen = () => {
+  // Send a message to let the api know I want to receive messages
+  orderBookSocket.send(PRICE_SUBSCRIBE_EVENT);
+};
+
+const updateOrdersInMemory = (e: any) => {
+  const newOrders = JSON.parse(e.data) as OrderBook;
+
+  const mergedOrders = mergeOrderBooks(ordersInMemory, newOrders);
+  prevOrdersInMemory = { ...ordersInMemory };
+  ordersInMemory = { ...mergedOrders };
+
+  if (!isEqual(ordersInMemory.asks, prevOrdersInMemory.asks)) {
+    console.log(`this is good, the asks are not equal. Its going to refresh`);
+    console.log(
+      `in mem have ${ordersInMemory.asks.length} asks and ${ordersInMemory.bids.length} bids`
+    );
+  }
+};
+
+orderBookSocket.onmessage = updateOrdersInMemory;
+
 export const OrderBookTables = () => {
   const [bidsToRender, setBids] = useState<OrderToDisplay[]>([]);
   const [asksToRender, setAsks] = useState<OrderToDisplay[]>([]);
-
-  const orderBookSocket: React.MutableRefObject<null | WebSocket> = useRef(
-    null
-  );
 
   useInterval(() => {
     const { bids, asks } = ordersInMemory;
@@ -47,10 +67,11 @@ export const OrderBookTables = () => {
 
     const orderWithNonZeroSize = (bid: OrderFromWebSocket) => bid[1];
     const sortedByPrice = (
-      bida: OrderFromWebSocket,
-      bidb: OrderFromWebSocket
-    ) => bida[0] - bidb[0];
+      orderA: OrderFromWebSocket,
+      orderB: OrderFromWebSocket
+    ) => orderA[0] - orderB[0];
 
+    debugger;
     const nonZeroBids = bids.filter(orderWithNonZeroSize).sort(sortedByPrice);
     const nonZeroAsks = asks.filter(orderWithNonZeroSize).sort(sortedByPrice);
 
@@ -58,42 +79,34 @@ export const OrderBookTables = () => {
     const bidsWithTotals = ordersWithSummedTotals(nonZeroBids.reverse());
     const asksWithTotals = ordersWithSummedTotals(nonZeroAsks);
 
-    setAsks(asksWithTotals.slice(0, 5)); // only take the top 3
-    setBids(bidsWithTotals.slice(0, 5)); // only take the top 3
-  }, 400);
+    setAsks(asksWithTotals.slice(0, 3)); // only take the top 3
+    setBids(bidsWithTotals.slice(0, 3)); // only take the top 3
+  }, 2000);
 
-  useEffect(() => {
-    orderBookSocket.current = new WebSocket(
-      "wss://www.cryptofacilities.com/ws/v1​"
-    );
+  const spreadPercentage =
+    (100 * (asksToRender[0]?.price - bidsToRender[0]?.price)) /
+    asksToRender[0]?.price;
 
-    orderBookSocket.current.onopen = () => {
-      // Send a message to let the api know I want to receive messages
-      orderBookSocket.current?.send(PRICE_SUBSCRIBE_EVENT);
-    };
-
-    orderBookSocket.current.onmessage = updateOrdersInMemory.bind(this);
-
-    // todo tear down the socket, handle api errors gracefully
-  }, []);
-
-  console.log("are we rendering!?!?!?");
+  console.log("Render");
   return (
-    <Flex>
-      <Box padding={4}>
-        <h4 style={{ backgroundColor: "lightgreen" }}>
-          Bids: people want to buy bitcoin at
-        </h4>
-        <OrderTable ordersToRender={bidsToRender} />
-      </Box>
+    <Box>
+      <h4>Spread: {formatNumber(spreadPercentage)}% </h4>
+      <Flex>
+        <Box padding={4}>
+          <h4 style={{ backgroundColor: "lightgreen" }}>
+            Bids: people want to buy bitcoin at
+          </h4>
+          <OrderTable ordersToRender={bidsToRender} />
+        </Box>
 
-      <Box padding={4}>
-        <h4 style={{ backgroundColor: "lightcoral" }}>
-          Asks: people want to sell bitcoin at
-        </h4>
-        <OrderTable ordersToRender={asksToRender} />
-      </Box>
-    </Flex>
+        <Box padding={4}>
+          <h4 style={{ backgroundColor: "lightcoral" }}>
+            Asks: people want to sell bitcoin at
+          </h4>
+          <OrderTable ordersToRender={asksToRender} />
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 
@@ -120,23 +133,11 @@ const OrderTable = ({
   </table>
 );
 
-const updateOrdersInMemory = (e: any) => {
-  const newOrders = JSON.parse(e.data) as OrderBook;
-
-  const mergedOrders = mergeOrderBooks(ordersInMemory, newOrders);
-  prevOrdersInMemory = { ...ordersInMemory };
-  ordersInMemory = { ...mergedOrders };
-  // console.log(
-  //   "are these the same!?",
-  //   isEqual(ordersInMemory, prevOrdersInMemory)
-  // );
-};
-
 const mergeOrderBooks = (previousOrders: OrderBook, newOrders: OrderBook) => {
   const newBids = mergeOrders(newOrders?.bids, previousOrders.bids);
   const newAsks = mergeOrders(newOrders?.asks, previousOrders.asks);
 
-  return { bids: newBids.slice(0, 30), asks: newAsks.slice(0, 30) };
+  return { bids: newBids.slice(0, 100), asks: newAsks.slice(0, 100) };
 };
 
 const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
@@ -161,25 +162,19 @@ const mergeOrders = (
     return oldOrders;
   }
 
-  // merge the bids + asks - hash map is probably fastest
-  const bidMap = {} as Dictionary;
+  // merge the bids + asks using a hash map
+  const orderMap = {} as Dictionary;
 
-  oldOrders?.forEach((bid) => (bidMap[bid[0].toString()] = bid[1]));
-  // stomp on it with new bids kind of like an object merge using the spread operator {...}
-  newOrders.forEach((bid) => (bidMap[bid[0].toString()] = bid[1]));
-  // turn it back into the object we were expecting
-  // I'm actually scared parsefloat will be the bottleneck here
-  const mergedBids = Object.entries(bidMap).map((entry) => [
+  oldOrders?.forEach((order) => (orderMap[order[0].toString()] = order[1]));
+  // stomp on the hashmap with new orders.
+  newOrders.forEach((order) => (orderMap[order[0].toString()] = order[1]));
+  // Turn it back into the object we were expecting (tuples)
+  const mergedOrders = Object.entries(orderMap).map((entry) => [
     parseFloat(entry[0]),
     entry[1],
   ]) as OrderFromWebSocket[];
 
-  // console.log(
-  //   `I am removing: ${
-  //     mergedBids.length - mergedBids.filter((order) => order[1]).length
-  //   } elements here!`
-  // );
-  return mergedBids.filter((order) => order[1]); // remove orders with no size
+  return mergedOrders.filter((order) => order[1]); // remove orders with no size
 };
 
 const formatNumber = (num: number) => {

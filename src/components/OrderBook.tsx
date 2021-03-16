@@ -5,12 +5,20 @@ import {
   OrderFromWebSocket,
   ordersInMemory,
 } from "../utils/in-memory-order-book";
+import { formatNumber } from "../utils/order-book-utils";
+import { OrderTable } from "./OrdersTable";
 
-interface OrderToDisplay {
+export interface OrderToDisplay {
   price: number;
   size: number;
   total: number; // t​he summed amount of the size at the current level and every level below it
 }
+
+const orderWithNonZeroSize = (bid: OrderFromWebSocket) => bid[1];
+const sortedByPrice = (
+  orderA: OrderFromWebSocket,
+  orderB: OrderFromWebSocket
+) => orderA[0] - orderB[0];
 
 export const OrderBookTables = () => {
   const [bidsToRender, setBids] = useState<OrderToDisplay[]>([]);
@@ -19,19 +27,6 @@ export const OrderBookTables = () => {
   useInterval(() => {
     const { bids, asks } = ordersInMemory;
 
-    // console.log(
-    //   `how many are in memory? ${bids.length} bids and ${asks.length} asks`,
-    //   bids,
-    //   asks
-    // );
-
-    const orderWithNonZeroSize = (bid: OrderFromWebSocket) => bid[1];
-    const sortedByPrice = (
-      orderA: OrderFromWebSocket,
-      orderB: OrderFromWebSocket
-    ) => orderA[0] - orderB[0];
-
-    debugger;
     const nonZeroBids = bids.filter(orderWithNonZeroSize).sort(sortedByPrice);
     const nonZeroAsks = asks.filter(orderWithNonZeroSize).sort(sortedByPrice);
 
@@ -41,27 +36,26 @@ export const OrderBookTables = () => {
 
     setAsks(asksWithTotals.slice(0, 3)); // only take the top 3
     setBids(bidsWithTotals.slice(0, 3)); // only take the top 3
-  }, 2000);
+  }, 500);
 
   const spreadPercentage =
     (100 * (asksToRender[0]?.price - bidsToRender[0]?.price)) /
     asksToRender[0]?.price;
 
-  console.log("Render");
   return (
     <Box>
       <h4>Spread: {formatNumber(spreadPercentage)}% </h4>
-      <Flex>
-        <Box padding={4}>
+      <Flex flexWrap="wrap">
+        <Box padding={4} width={[1, 1 / 2]}>
           <h4 style={{ backgroundColor: "lightgreen" }}>
-            Bids: people want to buy bitcoin at
+            Bids (orders to buy buy bitcoin)
           </h4>
           <OrderTable ordersToRender={bidsToRender} />
         </Box>
 
-        <Box padding={4}>
+        <Box padding={4} width={[1, 1 / 2]}>
           <h4 style={{ backgroundColor: "lightcoral" }}>
-            Asks: people want to sell bitcoin at
+            Asks (orders to sell bitcoin)
           </h4>
           <OrderTable ordersToRender={asksToRender} />
         </Box>
@@ -70,28 +64,15 @@ export const OrderBookTables = () => {
   );
 };
 
-const OrderTable = ({
-  ordersToRender,
-}: {
-  ordersToRender: OrderToDisplay[];
-}) => (
-  <table style={{ minWidth: "400px" }}>
-    <tbody>
-      <tr>
-        <th style={{ padding: "20px" }}>Price</th>
-        <th style={{ padding: "20px" }}>Size</th>
-        <th style={{ padding: "20px" }}>Total</th>
-      </tr>
-      {ordersToRender.map((order) => (
-        <tr key={`row-${order.price}`}>
-          <td style={{ padding: "20px" }}>{formatNumber(order.price)}</td>
-          <td style={{ padding: "20px" }}>{formatNumber(order.size)}</td>
-          <td style={{ padding: "20px" }}>{formatNumber(order.total)}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-);
+// const RefreshSelect = () => {
+//   const rates = [{label: '1 second', value: 1000},{label: '5 seconds', value: 1000},{label: '1/10 second', value: 100}]
+
+//   <select defaultValue="1 second">
+//     {rates.map( ({value, label}) => (
+//       <option key={label}>{label}</option>
+//     ))}
+//   </select>;
+// };
 
 const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
   let i = 0,
@@ -107,6 +88,5 @@ const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
   return bidsWithTotals;
 };
 
-const formatNumber = (num: number) => {
-  return num.toLocaleString("en-US", { minimumFractionDigits: 2 });
-};
+// Styling to note:
+// Monospace fonts are what people use for numbers (each char is the same width)

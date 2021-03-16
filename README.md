@@ -3,9 +3,19 @@
 - You will need a node version > 12.0.0. I recommend using (NVM)[https://danyal.dk/blog/2018/11/11/install-nvm-node-version-manager-node-on-mac/] to manage your node version.
 - `yarn && yarn start` to get a local build set up.
 
-# Getting Started with Create React App
+## Notes
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Oh wow, I'm getting hundreds of websocket messages.
+
+What is the throttle for react rendering?
+
+I could buffer them somehow - only render once every ten!?
+
+Do some sort of callback every second....
+
+I could even implement it so that I can choose how frequently I want to re-render
+
+I probably want to keep the result in memory right? rather than naively setting state every time I get a message from the websocket.
 
 ## Available Scripts
 

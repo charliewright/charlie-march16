@@ -40,6 +40,6 @@ export const mergeOrders = (
   return mergedOrders.filter((order) => order[1]); // remove orders with no size
 };
 
-export const formatNumber = (num: number) => {
-  return num.toLocaleString("en-US", { minimumFractionDigits: 2 });
+export const formatNumber = (num: number, digits: number) => {
+  return num.toLocaleString("en-US", { minimumFractionDigits: digits });
 };

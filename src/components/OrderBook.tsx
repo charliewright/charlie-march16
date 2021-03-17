@@ -44,9 +44,9 @@ export const OrderBookTables = () => {
 
   return (
     <Box>
-      <h4>Spread: {formatNumber(spreadPercentage)}% </h4>
+      <h4>Spread: {formatNumber(spreadPercentage, 2)}% </h4>
       <Flex flexWrap="wrap">
-        <Box padding={2} width={[1, 1 / 2]}>
+        <Box padding={2} width={[1, 1, 1 / 3]}>
           <h4
             className="darkmode-ignore"
             style={{ backgroundColor: "lightgreen", width: "100%" }}
@@ -56,7 +56,7 @@ export const OrderBookTables = () => {
           <OrderTable ordersToRender={bidsToRender} />
         </Box>
 
-        <Box padding={2} width={[1, 1 / 2]}>
+        <Box padding={2} width={[1, 1, 1 / 3]}>
           <h4
             className="darkmode-ignore"
             style={{ backgroundColor: "lightcoral", width: "100%" }}

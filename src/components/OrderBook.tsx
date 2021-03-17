@@ -25,17 +25,9 @@ export const OrderBookTables = () => {
   const [asksToRender, setAsks] = useState<OrderToDisplay[]>([]);
 
   useInterval(() => {
-    const { bids, asks } = ordersInMemory;
-
-    const nonZeroBids = bids.filter(orderWithNonZeroSize).sort(sortedByPrice);
-    const nonZeroAsks = asks.filter(orderWithNonZeroSize).sort(sortedByPrice);
-
-    // We're concerned with the highest bids and the lowest asks
-    const bidsWithTotals = ordersWithSummedTotals(nonZeroBids.reverse());
-    const asksWithTotals = ordersWithSummedTotals(nonZeroAsks);
-
-    setAsks(asksWithTotals.slice(0, 3)); // only take the top 3
-    setBids(bidsWithTotals.slice(0, 3)); // only take the top 3
+    const { bids, asks } = aggregateOrdersInMemory();
+    setAsks(asks);
+    setBids(bids);
   }, 500);
 
   const spreadPercentage =
@@ -70,6 +62,7 @@ export const OrderBookTables = () => {
   );
 };
 
+// TODO: later, make a refresh rate selector
 // const RefreshSelect = () => {
 //   const rates = [{label: '1 second', value: 1000},{label: '5 seconds', value: 1000},{label: '1/10 second', value: 100}]
 
@@ -94,5 +87,16 @@ const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
   return bidsWithTotals;
 };
 
-// Styling to note:
-// Monospace fonts are what people use for numbers (each char is the same width)
+const aggregateOrdersInMemory = () => {
+  const { bids, asks } = ordersInMemory;
+
+  const nonZeroBids = bids.filter(orderWithNonZeroSize).sort(sortedByPrice);
+  const nonZeroAsks = asks.filter(orderWithNonZeroSize).sort(sortedByPrice);
+
+  // We're concerned with the highest bids and the lowest asks
+  const bidsWithTotals = ordersWithSummedTotals(nonZeroBids.reverse());
+  const asksWithTotals = ordersWithSummedTotals(nonZeroAsks);
+
+  // only take the top 3
+  return { bids: bidsWithTotals.slice(0, 3), asks: asksWithTotals.slice(0, 3) };
+};

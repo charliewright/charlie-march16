@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import useInterval from "react-useinterval";
 import { Flex, Box } from "rebass";
-import {
-  OrderFromWebSocket,
-  ordersInMemory,
-} from "../utils/in-memory-order-book";
+import { aggregateOrdersInMemory } from "../utils/in-memory-order-book";
 import { formatNumber } from "../utils/order-book-utils";
 import { OrderTable } from "./OrdersTable";
 
@@ -13,12 +10,6 @@ export interface OrderToDisplay {
   size: number;
   total: number; // t​he summed amount of the size at the current level and every level below it
 }
-
-const orderWithNonZeroSize = (bid: OrderFromWebSocket) => bid[1];
-const sortedByPrice = (
-  orderA: OrderFromWebSocket,
-  orderB: OrderFromWebSocket
-) => orderA[0] - orderB[0];
 
 export const OrderBookTables = () => {
   const [bidsToRender, setBids] = useState<OrderToDisplay[]>([]);
@@ -72,31 +63,3 @@ export const OrderBookTables = () => {
 //     ))}
 //   </select>;
 // };
-
-const ordersWithSummedTotals = (bids: OrderFromWebSocket[]) => {
-  let i = 0,
-    total = 0;
-  const bidsWithTotals = [];
-
-  while (i < bids.length) {
-    const bid = bids[i];
-    total += bid[1];
-    bidsWithTotals.push({ price: bid[0], size: bid[1], total });
-    i++;
-  }
-  return bidsWithTotals;
-};
-
-const aggregateOrdersInMemory = () => {
-  const { bids, asks } = ordersInMemory;
-
-  const nonZeroBids = bids.filter(orderWithNonZeroSize).sort(sortedByPrice);
-  const nonZeroAsks = asks.filter(orderWithNonZeroSize).sort(sortedByPrice);
-
-  // We're concerned with the highest bids and the lowest asks
-  const bidsWithTotals = ordersWithSummedTotals(nonZeroBids.reverse());
-  const asksWithTotals = ordersWithSummedTotals(nonZeroAsks);
-
-  // only take the top 3
-  return { bids: bidsWithTotals.slice(0, 3), asks: asksWithTotals.slice(0, 3) };
-};

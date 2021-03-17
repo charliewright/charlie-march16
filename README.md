@@ -3,7 +3,7 @@
 - You will need a node version > 12.0.0. I recommend using [NVM](https://danyal.dk/blog/2018/11/11/install-nvm-node-version-manager-node-on-mac/) to manage your node version.
 - `yarn && yarn start` to get a local build set up.
 - `yarn test` to run the unit tests
-- check out a live version at
+- check out a live version [hosted on netlify](https://vibrant-wozniak-8d79b8.netlify.app/)
 
 ## Q/A
 
@@ -42,7 +42,7 @@ oldOrders?.forEach((order) => (orderMap[order[0].toString()] = order[1]));
 
 ```
 
-Rather than writing an `if` statement and increasing the complexity of the code by adding another code path with indentation and curly brackets `{`, I can optionally chain off the `oldOrders` object. 
+Rather than writing an `if` statement and increasing the complexity of the code by adding another code path with indentation and curly brackets `{`, I can optionally chain off the `oldOrders` object.
 
 The ? operator results in more readable code, and hopefully fewer "cannot access X of undefined" errors.
 
@@ -56,7 +56,7 @@ Ideally, when tracking down a performance issue I would be able to replicate the
 
 Once I reproduce the performance issue locally, I like to use `console.time()` calls while progressively commenting out code to track down the offending line/component. I call this method "binary search debugging".
 
-I have had to track down production issues before. At a previous company, we had shipped an angular data table component that would lag and hang the browser if there were too many rows. I was able to isolate the bug to an `<input>` form that we were initializing for each row - meaning that our page had hundreds of `angular watchers`. 
+I have had to track down production issues before. At a previous company, we had shipped an angular data table component that would lag and hang the browser if there were too many rows. I was able to isolate the bug to an `<input>` form that we were initializing for each row - meaning that our page had hundreds of `angular watchers`.
 
 I fixed the bug by initializing the `<input>` form only when clicking on the cell in question.
 
@@ -76,16 +76,13 @@ When working with a team of developers, it is important to raise security questi
 
 As a consumer of the orders API, I had to write logic to aggregate the orders delta.
 
-I were developing the API for many clients (web, mobile app, more than one web client app) it might be better to have the WebSocket aggregate the orders on the server side. Having a more complete server (returns all orders, spread, groupings) with a "thin client" would make client development more straightforward. 
+I were developing the API for many clients (web, mobile app, more than one web client app) it might be better to have the WebSocket aggregate the orders on the server side. Having a more complete server (returns all orders, spread, groupings) with a "thin client" would make client development more straightforward.
 
 <!-- TODO:
 
-- error handling around dead socket maybe!?
-- make sure the layout works on mobile (table + header + dark mode)
-- percentage based order colour maybe!? that would actually be hype
-- Lots of writing (two parts, right? I should spend time writing down my answers in the readme)
 
-css fiddle on mobile/desktop
 get rid of noisy numbers (group orders together! that is a good feature on the exchange)
+- error handling around dead socket maybe!?
+
 drop it onto netlify!
 more clickability (links to websocket!? other order books) -->

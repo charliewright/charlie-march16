@@ -29,3 +29,13 @@ const updateOrdersInMemory = (e: any) => {
 };
 
 orderBookSocket.onmessage = updateOrdersInMemory;
+
+// Hacky. Websockets do not try to reconnect by default, so I would have to re-attach the handlers.
+// An alternative is to use socket.io, which handles re-connects automatically.
+orderBookSocket.onclose = (event) => {
+  alert(
+    `Error occurred, connection closed. Please refresh the page \n message: ${JSON.stringify(
+      event
+    )}`
+  );
+};
